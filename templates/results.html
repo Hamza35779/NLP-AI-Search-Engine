@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}{% if query %}{{ query }} · {% endif %}Results{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+{% endblock %}
+
+{% block content %}
+  {% with form_method='get', form_action=url_for('search'), form_compact=True %}
+    {% include "_partials/search_form.html" %}
+  {% endwith %}
+
+  <div class="results-shell">
+    <aside class="sidebar" aria-label="Search filters">
+      <div class="panel">
+        <h4>Ranking model</h4>
+        <div class="model-toggle" role="group" aria-label="Choose ranker">
+          {% for m in available_models %}
+            <a href="{{ url_for('search', q=query, model=m) }}"
+               class="{% if m == model %}active{% endif %}">
+              {{ m | upper }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if parsed %}
+        <div class="panel">
+          <h4>Parsed query</h4>
+          {% if parsed.is_empty() %}
+            <p class="result-source">empty</p>
+          {% else %}
+            <ul class="parsed-tokens">
+              {% for t in parsed.must_terms %}<li class="must">+{{ t }}</li>{% endfor %}
+              {% for t in parsed.should_terms %}<li>{{ t }}</li>{% endfor %}
+              {% for p in parsed.phrases %}
+                <li class="phrase">"{{ p | join(' ') }}"</li>
+              {% endfor %}
+              {% for t in parsed.must_not_terms %}<li class="must-not">-{{ t }}</li>{% endfor %}
+            </ul>
+            <p class="result-source" style="margin-top:8px;">
+              Operator: <strong>{{ parsed.operator }}</strong>
+            </p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if stats %}
+        <div class="panel">
+          <h4>Index stats</h4>
+          <ul>
+            <li><span>Documents</span><strong>{{ stats.documents | int }}</strong></li>
+            <li><span>Vocabulary</span><strong>{{ stats.vocabulary_size | int }}</strong></li>
+            <li><span>Total tokens</span><strong>{{ stats.total_tokens | int }}</strong></li>
+            <li><span>Avg doc length</span><strong>{{ '%.1f' % stats.avg_doc_length }}</strong></li>
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="panel">
+        <h4>Operators</h4>
+        <ul>
+          <li><span><kbd>+term</kbd></span><strong>must</strong></li>
+          <li><span><kbd>-term</kbd></span><strong>exclude</strong></li>
+          <li><span><kbd>"phrase"</kbd></span><strong>exact</strong></li>
+          <li><span><kbd>AND</kbd></span><strong>all</strong></li>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="results-main">
+      {% if query %}
+        <p class="results-summary">
+          {% if results %}
+            <strong>{{ results | length }}</strong>
+            result{{ '' if results|length == 1 else 's' }} for
+            <strong>"{{ query }}"</strong>
+            <span class="badge">{{ model | upper }}</span>
+          {% else %}
+            No matches for <strong>"{{ query }}"</strong>.
+          {% endif %}
+        </p>
+      {% endif %}
+
+      {% if suggestion %}
+        <div class="suggestion" role="status">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                  stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>
+            Did you mean
+            <a href="{{ url_for('search', q=suggestion, model=model) }}">{{ suggestion }}</a>?
+          </span>
+        </div>
+      {% endif %}
+
+      <ol class="results">
+        {% for r in results %}
+          <li class="result">
+            <h3 class="result-title">
+              {% if r.url %}
+                <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.title }}</a>
+              {% else %}
+                {{ r.title }}
+              {% endif %}
+            </h3>
+            <div class="result-meta">
+              <span class="badge">score {{ '%.3f' % r.score }}</span>
+              <span class="score-bar" aria-hidden="true">
+                <span style="width: {{ ((r.score / max_score) * 100) | round(0) }}%;"></span>
+              </span>
+              {% if r.domain %}
+                <span class="result-source">{{ r.domain }}</span>
+              {% elif r.source %}
+                <span class="result-source">{{ r.source }}</span>
+              {% endif %}
+              {% if r.url %}
+                <span class="result-source" style="font-size: 0.8rem;">{{ r.url }}</span>
+              {% endif %}
+            </div>
+            <p class="result-snippet">{{ r.snippet | safe }}</p>
+          </li>
+        {% else %}
+          {% if query %}
+            <li class="empty-state">
+              <h2>No results found</h2>
+              <p>No documents match. Try removing a term, dropping a phrase,
+              or switching to <strong>TF-IDF</strong>.</p>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+
+      <a class="back-link" href="{{ url_for('index') }}">← Back to start</a>
+
+      {% if query and results %}
+        <div class="related-queries" id="related-queries">
+          <h4>Related Queries</h4>
+          <div id="related-list" class="chip-row"></div>
+        </div>
+        <script>
+          fetch(`/api/related-queries?q=${encodeURIComponent('{{ query }}')}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.related_queries && data.related_queries.length > 0) {
+                const container = document.getElementById('related-list');
+                container.innerHTML = data.related_queries
+                  .map(q => `<a class="chip" href="/search?q=${encodeURIComponent(q)}">${q}</a>`)
+                  .join('');
+                document.getElementById('related-queries').style.display = 'block';
+              }
+            })
+            .catch(() => {});
+        </script>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

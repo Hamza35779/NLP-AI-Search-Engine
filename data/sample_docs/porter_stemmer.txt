@@ -1,0 +1,19 @@
+The Porter stemming algorithm is a process for removing the commoner
+morphological and inflexional endings from words in English. Its main
+use is as part of a term normalization process that is usually done
+when setting up information retrieval systems. The algorithm was
+introduced by Martin Porter in 1980 and has since become a standard
+component of search engines and text mining pipelines.
+
+The stemmer works in five sequential steps. Each step inspects the
+suffix of the word and rewrites it according to a small set of rules
+that depend on the stem's measure: roughly the count of vowel-consonant
+patterns in the leading portion of the word. Examples include reducing
+"connection", "connections", "connective", and "connected" to a common
+stem "connect".
+
+Stemming improves recall in information retrieval by collapsing
+morphological variants to a shared form, but it can hurt precision if
+the rules are too aggressive. Lemmatization is a more linguistically
+informed alternative that returns dictionary forms instead of
+heuristic stems.

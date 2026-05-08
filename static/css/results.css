@@ -1,0 +1,177 @@
+/* Results page layout: search bar, sidebar filters, result list. */
+
+.results-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-top: 32px;
+  animation: slideUp 0.4s ease-out;
+}
+
+.sidebar {
+  position: sticky;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: border-color 200ms ease;
+}
+.panel:hover { border-color: var(--border-strong); }
+.panel h4 {
+  margin: 0 0 14px;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+.panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.panel li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+.panel li strong { color: var(--text); font-weight: 600; }
+.panel kbd { font-size: 0.8rem; background: var(--surface-2); padding: 2px 6px; border-radius: 4px; }
+
+.model-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  gap: 4px;
+}
+.model-toggle a {
+  flex: 1;
+  text-align: center;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  transition: all 200ms ease;
+}
+.model-toggle a.active {
+  background: var(--grad-brand);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.4);
+}
+.model-toggle a:hover:not(.active) {
+  color: var(--text);
+  background: var(--surface-2);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.results-main { min-width: 0; }
+
+.results-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin: 12px 0 24px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.results-summary strong { color: var(--text); }
+
+.suggestion {
+  margin: 0 0 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 209, 102, 0.32);
+  background: rgba(255, 209, 102, 0.08);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideUp 0.4s ease-out;
+}
+.suggestion svg { width: 20px; height: 20px; color: var(--warning); flex-shrink: 0; }
+.suggestion a { font-weight: 600; color: var(--warning); }
+
+.score-explain {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+.parsed-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.parsed-tokens li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  transition: all 200ms ease;
+}
+.parsed-tokens li:hover { transform: translateY(-1px); }
+.parsed-tokens .must     { color: var(--success); border-color: rgba(110, 231, 183, 0.3); }
+.parsed-tokens .must-not { color: var(--danger);  border-color: rgba(255, 123, 123, 0.3); }
+.parsed-tokens .phrase   { color: var(--accent);  border-color: var(--accent-ring); }
+
+.back-link {
+  margin-top: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  transition: all 200ms ease;
+  font-size: 0.95rem;
+}
+.back-link:hover { color: var(--text); transform: translateX(-4px); }
+
+.related-queries {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  animation: slideUp 0.5s ease-out;
+}
+.related-queries h4 {
+  margin: 0 0 12px;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 820px) {
+  .results-shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; order: 2; }
+  .results-shell { gap: 20px; }
+}

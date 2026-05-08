@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nlp-search-engine"
+version = "0.3.0"
+description = "A small NLP search engine: TF-IDF, BM25, and semantic search with Flask web UI, analytics, and autocomplete."
+readme = { file = "README.pdf", content-type = "application/pdf" }
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [
+    { name = "Hamza Abdul Karim" }
+]
+keywords = [
+    "search-engine", "information-retrieval", "tf-idf", "bm25",
+    "nlp", "porter-stemmer", "inverted-index",
+    "semantic-search", "analytics", "autocomplete"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Indexing",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+]
+dependencies = [
+    "flask>=2.3.0",
+    "nltk>=3.8.1",
+    "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "ruff>=0.4.0",
+    "black>=24.0.0",
+    "pre-commit>=3.5.0",
+]
+docs = [
+    "reportlab>=4.0.0",
+    "matplotlib>=3.7.0",
+    "svglib>=1.5.0",
+]
+
+[project.urls]
+Homepage      = "https://github.com/AbdulGhani002/nlp-search-engine"
+Repository    = "https://github.com/AbdulGhani002/nlp-search-engine"
+Documentation = "https://github.com/AbdulGhani002/nlp-search-engine/tree/main/docs"
+Issues        = "https://github.com/AbdulGhani002/nlp-search-engine/issues"
+Changelog     = "https://github.com/AbdulGhani002/nlp-search-engine/blob/main/CHANGELOG.pdf"
+
+[project.scripts]
+nlp-search = "cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.setuptools.package-data]
+"src" = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["data", "static", "templates"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B", "SIM"]

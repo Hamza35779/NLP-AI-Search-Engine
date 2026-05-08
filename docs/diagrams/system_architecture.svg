@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 760" width="720" height="760"
+     font-family="'Times New Roman', Times, serif" font-size="13" fill="#000">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000"/>
+    </marker>
+    <style>
+      .lbl   { text-anchor: middle; }
+      .grp   { text-anchor: start; font-style: italic; font-size: 12px; fill: #333; }
+      .box   { fill: #fff; stroke: #000; stroke-width: 1.4; }
+      .face  { fill: #fff; stroke: #000; stroke-width: 2; }
+      .layer { fill: none; stroke: #555; stroke-width: 0.8; stroke-dasharray: 4 4; }
+      .edge  { stroke: #000; stroke-width: 1.2; fill: none; }
+    </style>
+  </defs>
+
+  <text x="360" y="26" class="lbl" font-size="16" font-weight="700">Figure 1. System architecture</text>
+  <text x="360" y="44" class="lbl" font-size="11" fill="#333">Components and their compile-time dependencies</text>
+
+  <!-- Layer: Sources -->
+  <rect x="40"  y="68"  width="640" height="74" class="layer"/>
+  <text x="50" y="82" class="grp">I. Sources</text>
+  <rect x="240" y="92" width="100" height="38" class="box"/>
+  <text x="290" y="116" class="lbl">Filesystem</text>
+  <rect x="380" y="92" width="100" height="38" class="box"/>
+  <text x="430" y="116" class="lbl">JSON corpus</text>
+
+  <!-- Layer: Indexing -->
+  <rect x="40"  y="158" width="640" height="100" class="layer"/>
+  <text x="50" y="172" class="grp">II. Indexing pipeline</text>
+  <rect x="80"  y="190" width="140" height="46" class="box"/>
+  <text x="150" y="216" class="lbl">DocumentLoader</text>
+  <rect x="290" y="190" width="140" height="46" class="box"/>
+  <text x="360" y="210" class="lbl">Preprocessor</text>
+  <text x="360" y="226" class="lbl" font-size="11" fill="#444">tokens · stems</text>
+  <rect x="500" y="190" width="140" height="46" class="box"/>
+  <text x="570" y="210" class="lbl">InvertedIndex</text>
+  <text x="570" y="226" class="lbl" font-size="11" fill="#444">postings · stats</text>
+
+  <!-- Layer: Models -->
+  <rect x="40"  y="274" width="640" height="100" class="layer"/>
+  <text x="50" y="288" class="grp">III. Ranking models</text>
+  <rect x="100" y="306" width="120" height="46" class="box"/>
+  <text x="160" y="332" class="lbl">TfIdfModel</text>
+  <rect x="300" y="306" width="120" height="46" class="box"/>
+  <text x="360" y="332" class="lbl">BM25Model</text>
+  <rect x="500" y="306" width="120" height="46" class="box"/>
+  <text x="560" y="332" class="lbl">Ranker</text>
+
+  <!-- Layer: Search facade -->
+  <rect x="40"  y="390" width="640" height="160" class="layer"/>
+  <text x="50" y="404" class="grp">IV. Search facade</text>
+  <rect x="280" y="430" width="160" height="56" class="face"/>
+  <text x="360" y="454" class="lbl" font-weight="700">SearchEngine</text>
+  <text x="360" y="472" class="lbl" font-size="11">facade</text>
+
+  <rect x="60"  y="500" width="140" height="40" class="box"/>
+  <text x="130" y="525" class="lbl">QueryProcessor</text>
+  <rect x="220" y="500" width="140" height="40" class="box"/>
+  <text x="290" y="525" class="lbl">SnippetGenerator</text>
+  <rect x="380" y="500" width="140" height="40" class="box"/>
+  <text x="450" y="525" class="lbl">SpellCorrector</text>
+  <rect x="540" y="500" width="120" height="40" class="box"/>
+  <text x="600" y="525" class="lbl">Metrics</text>
+
+  <!-- Layer: Frontends -->
+  <rect x="40"  y="566" width="640" height="86" class="layer"/>
+  <text x="50" y="580" class="grp">V. Frontends</text>
+  <rect x="220" y="592" width="120" height="46" class="box"/>
+  <text x="280" y="619" class="lbl">CLI (cli.py)</text>
+  <rect x="380" y="592" width="120" height="46" class="box"/>
+  <text x="440" y="612" class="lbl">Flask app.py</text>
+  <text x="440" y="628" class="lbl" font-size="11" fill="#444">HTML + JSON</text>
+
+  <!-- Edges: Sources -> Indexing -->
+  <path class="edge" d="M290,130 L290,168 L150,168 L150,190" marker-end="url(#arrow)"/>
+  <path class="edge" d="M430,130 L430,168 L360,168 L360,190" marker-end="url(#arrow)"/>
+
+  <!-- Edges: Indexing -->
+  <path class="edge" d="M220,213 L290,213" marker-end="url(#arrow)"/>
+  <path class="edge" d="M430,213 L500,213" marker-end="url(#arrow)"/>
+
+  <!-- Edges: Index -> Models -->
+  <path class="edge" d="M570,236 L570,264 L160,264 L160,306" marker-end="url(#arrow)"/>
+  <path class="edge" d="M570,264 L360,264 L360,306" marker-end="url(#arrow)"/>
+  <path class="edge" d="M570,236 L570,306" marker-end="url(#arrow)"/>
+
+  <!-- Edges: Models -> Ranker -->
+  <path class="edge" d="M220,329 L300,329" marker-end="url(#arrow)"/>
+  <path class="edge" d="M420,329 L500,329" marker-end="url(#arrow)"/>
+
+  <!-- Edges: Ranker -> SearchEngine -->
+  <path class="edge" d="M560,352 L560,388 L400,388 L400,430" marker-end="url(#arrow)"/>
+
+  <!-- Edges: helpers -> SearchEngine -->
+  <path class="edge" d="M130,500 L130,468 L280,468" marker-end="url(#arrow)"/>
+  <path class="edge" d="M290,500 L290,468 L320,468" marker-end="url(#arrow)"/>
+  <path class="edge" d="M450,500 L450,468 L420,468" marker-end="url(#arrow)"/>
+  <path class="edge" d="M600,500 L600,468 L440,468" marker-end="url(#arrow)"/>
+
+  <!-- Edges: SearchEngine -> Frontends -->
+  <path class="edge" d="M340,486 L340,564 L280,564 L280,592" marker-end="url(#arrow)"/>
+  <path class="edge" d="M380,486 L380,564 L440,564 L440,592" marker-end="url(#arrow)"/>
+
+  <text x="360" y="710" class="lbl" font-size="11" fill="#333">Solid arrows denote a "depends on" relation. Dashed boxes group components by responsibility.</text>
+</svg>

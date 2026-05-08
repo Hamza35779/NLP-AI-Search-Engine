@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}NLP Search Engine{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <h1>
+      Search a corpus the
+      <span class="gradient-word">classical NLP</span> way
+    </h1>
+    <p class="hero-tagline">
+      A miniature information-retrieval engine in pure Python: tokenization,
+      Porter stemming, an inverted index, and TF-IDF / Okapi BM25 ranking —
+      with snippets, spell suggestions, and a clean web UI.
+    </p>
+
+    <div class="hero-form-wrap">
+      {% with form_method='get', form_action=url_for('search'), form_compact=False %}
+        {% include "_partials/search_form.html" %}
+      {% endwith %}
+
+      <ul class="chip-row">
+        <li class="chip-label">Try:</li>
+        <li><a class="chip" href="{{ url_for('search', q='information retrieval') }}">information retrieval</a></li>
+        <li><a class="chip" href="{{ url_for('search', q='neural language model') }}">neural language model</a></li>
+        <li><a class="chip" href="{{ url_for('search', q='\"natural language\"') }}">"natural language"</a></li>
+        <li><a class="chip" href="{{ url_for('search', q='ranking +bm25 -neural') }}">ranking +bm25 -neural</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="features">
+    <div class="section-title">
+      <span class="eyebrow">Capabilities</span>
+      <h2 id="features">What's inside</h2>
+    </div>
+
+    <div class="feature-grid">
+      <article class="feature">
+        <div class="icon" aria-hidden="true">⌁</div>
+        <h3>NLP preprocessing</h3>
+        <p>Tokenization, case folding, stop-word removal, and a compact Porter stemmer.</p>
+      </article>
+      <article class="feature">
+        <div class="icon" aria-hidden="true">≡</div>
+        <h3>Inverted index</h3>
+        <p>Postings carry term frequencies and positions, enabling phrase queries.</p>
+      </article>
+      <article class="feature">
+        <div class="icon" aria-hidden="true">∑</div>
+        <h3>TF-IDF + BM25</h3>
+        <p>Two interchangeable rankers; tune <code>k1</code>/<code>b</code> for BM25 in <code>config.py</code>.</p>
+      </article>
+      <article class="feature">
+        <div class="icon" aria-hidden="true">¶</div>
+        <h3>Smart snippets</h3>
+        <p>Best-window selection with highlighted query terms in the original text.</p>
+      </article>
+      <article class="feature">
+        <div class="icon" aria-hidden="true">✎</div>
+        <h3>Spell suggestions</h3>
+        <p>Damerau-Levenshtein matching against the index vocabulary.</p>
+      </article>
+      <article class="feature">
+        <div class="icon" aria-hidden="true">◐</div>
+        <h3>Dual front-ends</h3>
+        <p>Argparse CLI plus this Flask web app. JSON API at <code>/api/search</code>.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="how">
+    <div class="section-title">
+      <span class="eyebrow">Pipeline</span>
+      <h2 id="how">How a query flows</h2>
+    </div>
+
+    <ol class="steps">
+      <li class="step">
+        <h3>Parse</h3>
+        <p>The query parser extracts phrases, <code>+must</code>, <code>-must-not</code>, and boolean ops.</p>
+      </li>
+      <li class="step">
+        <h3>Normalize</h3>
+        <p>Tokens are lowercased, stop-filtered, and Porter-stemmed.</p>
+      </li>
+      <li class="step">
+        <h3>Score</h3>
+        <p>BM25 (default) or TF-IDF scores every candidate document.</p>
+      </li>
+      <li class="step">
+        <h3>Render</h3>
+        <p>Top-k results are filtered, snipped, and highlighted for display.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="section" aria-labelledby="quickstart">
+    <div class="section-title">
+      <span class="eyebrow">Run it</span>
+      <h2 id="quickstart">Quickstart</h2>
+    </div>
+    <pre class="code-block"><span class="prompt">$</span> pip install <span class="flag">-r</span> requirements.txt
+<span class="prompt">$</span> python scripts/build_index.py
+<span class="prompt">$</span> python <span class="kw">app.py</span>      <span class="arg"># open http://127.0.0.1:5000</span>
+<span class="prompt">$</span> python <span class="kw">cli.py</span> <span class="arg">"machine learning"</span></pre>
+  </section>
+{% endblock %}

@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+.pytest_cache/
+search_engine.log
+index_data/
+!.gitkeep
+
+# Node (if applicable)
+node_modules/
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Pre-commit
+.pre-commit-config.yaml

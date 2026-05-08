@@ -1,0 +1,16 @@
+Evaluation metrics for ranked retrieval measure how well a system orders
+relevant documents above non-relevant ones. Precision at k counts the
+fraction of the top k results that are relevant, and recall at k counts
+the fraction of all relevant documents that appear in the top k.
+
+Average precision averages precision values at the ranks where relevant
+documents appear, which rewards systems that place relevant documents
+near the top of the list. Mean average precision, or MAP, averages this
+quantity over a set of test queries and is one of the most widely used
+single-number summaries of retrieval quality.
+
+Mean reciprocal rank focuses on the rank of the first relevant document
+and is well suited to known-item search, where each query has a single
+correct answer. Normalized discounted cumulative gain, or nDCG, uses
+graded relevance judgements and a logarithmic position discount, which
+makes it the standard choice for web search evaluations.

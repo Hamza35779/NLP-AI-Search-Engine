@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 620" width="760" height="620"
+     font-family="'Times New Roman', Times, serif" font-size="12" fill="#000">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000"/>
+    </marker>
+    <style>
+      .lbl    { text-anchor: middle; }
+      .actor  { fill: #fff; stroke: #000; stroke-width: 1.4; }
+      .life   { stroke: #000; stroke-width: 0.8; stroke-dasharray: 4 4; }
+      .activ  { fill: #fff; stroke: #000; stroke-width: 1.2; }
+      .msg    { stroke: #000; stroke-width: 1.1; fill: none; }
+      .ret    { stroke: #000; stroke-width: 1.1; fill: none; stroke-dasharray: 4 3; }
+      .mtxt   { font-size: 11px; }
+      .num    { font-weight: 700; font-size: 11px; }
+    </style>
+  </defs>
+
+  <text x="380" y="26" class="lbl" font-size="16" font-weight="700">Figure 3. Query lifecycle (sequence diagram)</text>
+  <text x="380" y="44" class="lbl" font-size="11" fill="#333">User issues a query through the SearchEngine facade</text>
+
+  <!-- Actor heads -->
+  <g>
+    <rect x="40"  y="68" width="100" height="34" class="actor"/>
+    <text x="90"  y="90"  class="lbl">User</text>
+
+    <rect x="180" y="68" width="120" height="34" class="actor"/>
+    <text x="240" y="90"  class="lbl">SearchEngine</text>
+
+    <rect x="340" y="68" width="120" height="34" class="actor"/>
+    <text x="400" y="90"  class="lbl">QueryProcessor</text>
+
+    <rect x="500" y="68" width="100" height="34" class="actor"/>
+    <text x="550" y="90"  class="lbl">Ranker</text>
+
+    <rect x="640" y="68" width="100" height="34" class="actor"/>
+    <text x="690" y="90"  class="lbl">InvertedIndex</text>
+  </g>
+
+  <!-- Lifelines -->
+  <line class="life" x1="90"  y1="102" x2="90"  y2="560"/>
+  <line class="life" x1="240" y1="102" x2="240" y2="560"/>
+  <line class="life" x1="400" y1="102" x2="400" y2="560"/>
+  <line class="life" x1="550" y1="102" x2="550" y2="560"/>
+  <line class="life" x1="690" y1="102" x2="690" y2="560"/>
+
+  <!-- Activation bars on SearchEngine -->
+  <rect class="activ" x="234" y="130" width="12" height="380"/>
+  <rect class="activ" x="394" y="150" width="12" height="60"/>
+  <rect class="activ" x="544" y="240" width="12" height="120"/>
+  <rect class="activ" x="684" y="260" width="12" height="80"/>
+
+  <!-- Msg 1: User -> SearchEngine -->
+  <text x="165" y="125" class="mtxt"><tspan class="num">1.</tspan> search("\"natural language\" +nlp -toy")</text>
+  <path class="msg" d="M90,135 L234,135" marker-end="url(#arr)"/>
+
+  <!-- Msg 2: SearchEngine -> QueryProcessor -->
+  <text x="320" y="160" class="mtxt"><tspan class="num">2.</tspan> parse(raw)</text>
+  <path class="msg" d="M246,170 L394,170" marker-end="url(#arr)"/>
+
+  <!-- Msg 3: QueryProcessor -> SearchEngine return -->
+  <text x="320" y="200" class="mtxt"><tspan class="num">3.</tspan> ParsedQuery</text>
+  <path class="ret" d="M394,210 L246,210" marker-end="url(#arr)"/>
+
+  <!-- Msg 4: SearchEngine -> Ranker -->
+  <text x="395" y="232" class="mtxt"><tspan class="num">4.</tspan> rank(positive_terms)</text>
+  <path class="msg" d="M246,242 L544,242" marker-end="url(#arr)"/>
+
+  <!-- Msg 5: Ranker -> InvertedIndex -->
+  <text x="615" y="262" class="mtxt"><tspan class="num">5.</tspan> postings, df, lengths</text>
+  <path class="msg" d="M556,272 L684,272" marker-end="url(#arr)"/>
+
+  <!-- Msg 6: InvertedIndex -> Ranker -->
+  <text x="615" y="305" class="mtxt"><tspan class="num">6.</tspan> raw stats</text>
+  <path class="ret" d="M684,315 L556,315" marker-end="url(#arr)"/>
+
+  <!-- Msg 7: Ranker -> SearchEngine return -->
+  <text x="395" y="345" class="mtxt"><tspan class="num">7.</tspan> [(doc_id, score), ...]</text>
+  <path class="ret" d="M544,355 L246,355" marker-end="url(#arr)"/>
+
+  <!-- Msg 8: Self-loop on SearchEngine: filter phrases / must / not -->
+  <text x="290" y="385" class="mtxt"><tspan class="num">8.</tspan> apply phrase + boolean filters (self)</text>
+  <path class="msg" d="M246,395 L300,395 L300,420 L246,420" marker-end="url(#arr)"/>
+
+  <!-- Msg 9: SearchEngine -> SnippetGenerator (drawn as self call to keep diagram tidy) -->
+  <text x="290" y="445" class="mtxt"><tspan class="num">9.</tspan> generate snippet for top-k (self)</text>
+  <path class="msg" d="M246,455 L300,455 L300,480 L246,480" marker-end="url(#arr)"/>
+
+  <!-- Msg 10: SearchEngine -> User return -->
+  <text x="165" y="503" class="mtxt"><tspan class="num">10.</tspan> SearchResult[]</text>
+  <path class="ret" d="M234,513 L90,513" marker-end="url(#arr)"/>
+
+  <text x="380" y="595" class="lbl" font-size="11" fill="#333">
+    Solid arrows are calls; dashed arrows are returns. Vertical bars indicate active processing on each component.
+  </text>
+</svg>

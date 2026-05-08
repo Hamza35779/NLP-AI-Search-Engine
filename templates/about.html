@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}About · NLP Search Engine{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+  <section class="hero" style="text-align:left; padding-bottom:0;">
+    <h1>About this project</h1>
+    <p class="hero-tagline" style="margin-left:0;">
+      A teaching-quality information-retrieval engine built from scratch,
+      covering the canonical NLP and IR pipeline used by classical search
+      systems before the rise of neural retrievers.
+    </p>
+  </section>
+
+  <section class="section">
+    <div class="section-title">
+      <span class="eyebrow">System</span>
+      <h2>What it does</h2>
+    </div>
+    <div class="feature-grid">
+      <article class="feature">
+        <div class="icon">①</div>
+        <h3>Indexing</h3>
+        <p>Reads a text or JSON corpus, normalizes tokens, and builds an
+        inverted index with positions and per-document statistics.</p>
+      </article>
+      <article class="feature">
+        <div class="icon">②</div>
+        <h3>Ranking</h3>
+        <p>Scores candidate documents with TF-IDF (cosine) or Okapi BM25
+        with tunable <code>k1</code> and <code>b</code>.</p>
+      </article>
+      <article class="feature">
+        <div class="icon">③</div>
+        <h3>Querying</h3>
+        <p>Parses bare terms, <code>+must</code> / <code>-must-not</code>,
+        quoted phrases, and boolean operators.</p>
+      </article>
+      <article class="feature">
+        <div class="icon">④</div>
+        <h3>Presentation</h3>
+        <p>Picks the best window, highlights matches, and offers a spell
+        suggestion when no documents match.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">
+      <span class="eyebrow">JSON</span>
+      <h2>API endpoints</h2>
+    </div>
+    <pre class="code-block"><span class="kw">GET</span> /api/search?q=<span class="arg">machine+learning</span>&amp;model=<span class="arg">bm25</span>&amp;k=10
+<span class="kw">GET</span> /api/stats</pre>
+    <p style="color: var(--text-muted); margin-top: 12px;">
+      Both routes return JSON; the search endpoint also includes the
+      Damerau-Levenshtein spell suggestion when relevant.
+    </p>
+  </section>
+
+  <section class="section">
+    <div class="section-title">
+      <span class="eyebrow">Source</span>
+      <h2>Project information</h2>
+    </div>
+    <div class="callout">
+      <div>
+        <strong>Author:</strong> Abdul Ghani &nbsp;·&nbsp;
+        <strong>Course:</strong> NLP coursework project<br>
+        <strong>Repository:</strong>
+        <a href="https://github.com/AbdulGhani002/nlp-search-engine">
+          github.com/AbdulGhani002/nlp-search-engine
+        </a><br>
+        <strong>License:</strong> MIT
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,17 @@
+Information retrieval (IR) is the science of searching for information in
+documents, searching for documents themselves, searching for metadata that
+describes documents, and searching within databases for text or sounds or
+images. The classical IR problem is the ad-hoc query: a user describes
+what they need with a short query, and the system ranks every document in
+the collection by likely relevance.
+
+The standard pipeline includes tokenization, normalization, stemming or
+lemmatization, building an inverted index, and using a ranking model such
+as TF-IDF or BM25 to score documents against queries. Modern systems also
+incorporate learning-to-rank, dense retrieval with neural embeddings, and
+hybrid approaches that combine sparse and dense signals.
+
+Evaluation uses metrics such as precision, recall, mean average precision,
+mean reciprocal rank, and normalized discounted cumulative gain. Test
+collections like TREC, MS MARCO, and BEIR provide standard benchmarks for
+comparing different retrieval systems.

@@ -1,0 +1,18 @@
+Word embeddings are dense vector representations of words learned from
+large text corpora. Unlike one-hot encodings, they place semantically
+similar words close together in vector space, so simple geometric
+operations capture meaningful linguistic relationships. The classic
+analogy "king minus man plus woman approximately equals queen" became
+the standard illustration of this property.
+
+Popular methods include word2vec, GloVe, and fastText. Word2vec trains
+a shallow neural network with either the skip-gram or continuous bag-of-
+words objective. GloVe instead factorizes a global word co-occurrence
+matrix. FastText extends word2vec with character-level information so
+out-of-vocabulary words can still receive useful embeddings.
+
+Modern systems usually replace static embeddings with contextualized
+representations from transformer language models. Even so, static
+embeddings remain useful as features for lightweight classifiers, in
+low-resource settings, and as inputs to dense retrievers when latency
+is critical.

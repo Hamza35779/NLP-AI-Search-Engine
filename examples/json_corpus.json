@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Vector space model",
+    "text": "The vector space model represents documents as vectors in a high-dimensional term space. Each dimension corresponds to a separate term, and the value of a dimension is a function of the term frequency in the document, weighted by inverse document frequency.",
+    "source": "examples/json_corpus.json"
+  },
+  {
+    "title": "Tokenization",
+    "text": "Tokenization is the process of segmenting a stream of characters into pieces called tokens. For English, simple regular-expression rules cover most cases, but languages without word boundaries — like Chinese or Japanese — require dedicated segmenters.",
+    "source": "examples/json_corpus.json"
+  },
+  {
+    "title": "Stop-word removal",
+    "text": "Stop-word removal discards extremely common terms like 'the', 'is', and 'and' before indexing. This shrinks the index and improves precision, at the cost of breaking some phrase queries that legitimately depend on stop words.",
+    "source": "examples/json_corpus.json"
+  },
+  {
+    "title": "Inverted index",
+    "text": "An inverted index maps each term to the list of documents that contain it. Augmenting the postings with positions enables phrase queries; augmenting them with term frequencies enables ranking with TF-IDF or BM25.",
+    "source": "examples/json_corpus.json"
+  }
+]

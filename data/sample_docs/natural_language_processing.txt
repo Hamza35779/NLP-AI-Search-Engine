@@ -1,0 +1,16 @@
+Natural language processing, or NLP, is the field of artificial
+intelligence that gives computers the ability to read, understand, and
+generate human language. NLP combines linguistics, statistics, and
+machine learning to build systems for translation, sentiment analysis,
+question answering, summarization, and speech recognition.
+
+Foundational tasks include tokenization, part-of-speech tagging, named
+entity recognition, parsing, and word-sense disambiguation. Higher-level
+tasks include machine translation, text classification, semantic role
+labeling, coreference resolution, and dialogue systems.
+
+Modern NLP is dominated by transformer-based language models such as
+BERT, GPT, and T5. These models are pre-trained on massive text corpora
+with self-supervised objectives and then fine-tuned for downstream tasks.
+Retrieval-augmented generation combines a search engine with a language
+model so the model can ground its answers in a document collection.

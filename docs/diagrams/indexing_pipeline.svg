@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" width="760" height="360"
+     font-family="'Times New Roman', Times, serif" font-size="13" fill="#000">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000"/>
+    </marker>
+    <style>
+      .lbl  { text-anchor: middle; }
+      .box  { fill: #fff; stroke: #000; stroke-width: 1.4; }
+      .data { fill: #fff; stroke: #000; stroke-width: 1.4; stroke-dasharray: 5 3; }
+      .edge { stroke: #000; stroke-width: 1.2; fill: none; }
+      .num  { font-weight: 700; }
+    </style>
+  </defs>
+
+  <text x="380" y="26" class="lbl" font-size="16" font-weight="700">Figure 2. Indexing pipeline</text>
+  <text x="380" y="44" class="lbl" font-size="11" fill="#333">Stages a document passes through before it can be queried</text>
+
+  <!-- Stage boxes -->
+  <g>
+    <rect x="30"  y="84" width="120" height="58" class="box"/>
+    <text x="90"  y="106" class="lbl num">1</text>
+    <text x="90"  y="124" class="lbl">Corpus path</text>
+    <text x="90"  y="138" class="lbl" font-size="11" fill="#444">.txt / .json</text>
+
+    <rect x="190" y="84" width="120" height="58" class="box"/>
+    <text x="250" y="106" class="lbl num">2</text>
+    <text x="250" y="124" class="lbl">DocumentLoader</text>
+    <text x="250" y="138" class="lbl" font-size="11" fill="#444">read &amp; assign IDs</text>
+
+    <rect x="350" y="84" width="120" height="58" class="box"/>
+    <text x="410" y="106" class="lbl num">3</text>
+    <text x="410" y="120" class="lbl">Preprocessor</text>
+    <text x="410" y="135" class="lbl" font-size="11" fill="#444">tokenize · stem</text>
+
+    <rect x="510" y="84" width="120" height="58" class="box"/>
+    <text x="570" y="106" class="lbl num">4</text>
+    <text x="570" y="124" class="lbl">Indexer</text>
+    <text x="570" y="138" class="lbl" font-size="11" fill="#444">add postings</text>
+
+    <rect x="670" y="84" width="80"  height="58" class="box"/>
+    <text x="710" y="106" class="lbl num">5</text>
+    <text x="710" y="128" class="lbl">Index</text>
+  </g>
+
+  <!-- Linear arrows -->
+  <path class="edge" d="M150,113 L190,113" marker-end="url(#arrow)"/>
+  <path class="edge" d="M310,113 L350,113" marker-end="url(#arrow)"/>
+  <path class="edge" d="M470,113 L510,113" marker-end="url(#arrow)"/>
+  <path class="edge" d="M630,113 L670,113" marker-end="url(#arrow)"/>
+
+  <!-- Side outputs -->
+  <text x="380" y="180" class="lbl" font-size="12" font-style="italic" fill="#333">
+    Stage 4 maintains three data structures:
+  </text>
+
+  <rect x="50"  y="200" width="200" height="56" class="data"/>
+  <text x="150" y="222" class="lbl">postings</text>
+  <text x="150" y="240" class="lbl" font-size="11" fill="#444">term &#x2192; [(doc_id, tf, positions)]</text>
+
+  <rect x="280" y="200" width="200" height="56" class="data"/>
+  <text x="380" y="222" class="lbl">document lengths</text>
+  <text x="380" y="240" class="lbl" font-size="11" fill="#444">doc_id &#x2192; |d|</text>
+
+  <rect x="510" y="200" width="200" height="56" class="data"/>
+  <text x="610" y="222" class="lbl">document frequency</text>
+  <text x="610" y="240" class="lbl" font-size="11" fill="#444">term &#x2192; df(t)</text>
+
+  <!-- Connectors from stage 4 to data -->
+  <path class="edge" d="M570,142 L570,180 L150,180 L150,200" marker-end="url(#arrow)"/>
+  <path class="edge" d="M570,142 L570,180 L380,180 L380,200" marker-end="url(#arrow)"/>
+  <path class="edge" d="M570,142 L570,180 L610,180 L610,200" marker-end="url(#arrow)"/>
+
+  <!-- Average doc length -->
+  <rect x="280" y="282" width="200" height="40" class="data"/>
+  <text x="380" y="306" class="lbl">avgdl (used by BM25)</text>
+  <path class="edge" d="M380,256 L380,282" marker-end="url(#arrow)"/>
+
+  <text x="380" y="346" class="lbl" font-size="11" fill="#333">Solid boxes are stages; dashed boxes are persistent data structures.</text>
+</svg>

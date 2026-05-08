@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="description"
+        content="A small NLP search engine: tokenization, Porter stemming, inverted index, TF-IDF and BM25 ranking, with a clean web UI.">
+  <title>{% block title %}NLP Search Engine{% endblock %}</title>
+
+  <link rel="icon" type="image/svg+xml"
+        href="{{ url_for('static', filename='img/favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">
+      <img class="brand-logo"
+           src="{{ url_for('static', filename='img/logo.svg') }}"
+           alt="">
+      <span class="brand-text">
+        NLP Search<span class="brand-suffix">/engine</span>
+      </span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary">
+      <a href="{{ url_for('index') }}"
+         class="{% if active == 'home' %}active{% endif %}">Home</a>
+      <a href="{{ url_for('about') }}"
+         class="{% if active == 'about' %}active{% endif %}">About</a>
+      <a href="https://github.com/AbdulGhani002/nlp-search-engine"
+         target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </nav>
+
+    {% if stats %}
+      <span class="stats-pill" title="Index health">
+        <span class="dot" aria-hidden="true"></span>
+        {{ stats.documents | int }} docs · {{ stats.vocabulary_size | int }} terms
+        · {{ stats.model | upper }}
+      </span>
+    {% endif %}
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div>Built as an NLP coursework project · TF-IDF + BM25 ranking</div>
+    <div>
+      <a href="https://github.com/AbdulGhani002/nlp-search-engine">Source on GitHub</a>
+      · MIT License
+    </div>
+  </footer>
+</body>
+</html>

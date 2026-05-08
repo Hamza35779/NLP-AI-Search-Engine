@@ -1,0 +1,19 @@
+Machine learning is a branch of artificial intelligence that focuses on
+building systems that learn from data instead of being explicitly
+programmed. Supervised learning trains models on labelled examples,
+unsupervised learning discovers structure in unlabelled data, and
+reinforcement learning teaches an agent to take actions that maximize
+expected reward.
+
+Common algorithms include linear regression, logistic regression, decision
+trees, random forests, gradient boosting, and support vector machines.
+Deep learning extends these ideas with multi-layer neural networks, which
+have driven breakthroughs in computer vision, speech recognition, and
+natural language processing.
+
+Important steps in any machine learning project are data collection,
+cleaning, feature engineering, model selection, hyperparameter tuning,
+and rigorous evaluation. Cross-validation, train / validation / test
+splits, and metrics tailored to the problem (accuracy, F1, AUC, RMSE,
+mean average precision) are essential to avoid overfitting and to
+estimate generalization error.

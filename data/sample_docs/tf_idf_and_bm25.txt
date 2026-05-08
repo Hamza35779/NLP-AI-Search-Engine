@@ -1,0 +1,16 @@
+TF-IDF stands for term frequency - inverse document frequency. It weights
+each term in a document by how often it appears locally and how rare it
+is across the whole collection. The resulting sparse vector representation
+allows queries and documents to be compared with cosine similarity, where
+documents that share many rare terms with the query rise to the top.
+
+BM25, also known as Okapi BM25, is a probabilistic ranking function that
+extends TF-IDF with two important refinements. First, it saturates the
+contribution of repeated terms using a parameter k1, so a word appearing
+ten times does not score ten times higher than appearing once. Second,
+it normalizes for document length using a parameter b, so very long
+documents do not unfairly dominate the ranking.
+
+Both models are unsupervised and remarkably strong baselines. They form
+the sparse retrieval component of many production search systems and are
+often combined with dense retrievers for state-of-the-art quality.

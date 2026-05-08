@@ -4,6 +4,7 @@ A production-grade Natural Language Processing search engine built in pure Pytho
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue?style=flat&logo=python)
 ![Flask](https://img.shields.io/badge/Flask-3.0+-lightgrey?style=flat&logo=flask)
+
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat)
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=flat)
 
@@ -14,12 +15,16 @@ A production-grade Natural Language Processing search engine built in pure Pytho
 ### Core NLP & Search Capabilities
 - **Advanced Text Preprocessing**: Tokenization, case folding, stop-word removal, and Porter stemming
 - **Inverted Index**: Efficient postings lists with term frequencies and positions
-- **Dual Ranking Models**: 
+- **Multiple Ranking Models**: 
   - TF-IDF with cosine similarity
   - Okapi BM25 with tunable parameters (k1, b)
+  - **Semantic Search** with TF-IDF vector embeddings
 - **Smart Query Parsing**: Supports quoted phrases, required/excluded terms, and boolean operators
 - **Intelligent Snippets**: Best-window selection with highlighted query terms
 - **Spell Checker**: Damerau-Levenshtein edit distance for query suggestions
+- **Query Autocomplete**: Real-time search suggestions as you type
+- **Related Queries**: Discover related search terms
+- **Search Analytics**: Track and analyze search patterns
 
 ### 🌐 Web Crawling & Real-World Search
 - **Web Crawler**: Breadth-first crawling with domain filtering
@@ -149,26 +154,37 @@ doc = load_web_page("https://example.com/page")
 curl "http://127.0.0.1:5000/api/search?q=machine+learning&model=bm25&k=5"
 ```
 
-**Response:**
-```json
-{
-  "query": "machine learning",
-  "model": "bm25",
-  "top_k": 5,
-  "results": [
-    {
-      "doc_id": 1,
-      "title": "Introduction to Machine Learning",
-      "snippet": "...machine learning algorithms...",
-      "score": 2.345,
-      "source": "/data/docs/ml.txt",
-      "url": "https://example.com/ml",
-      "domain": "example.com"
-    }
-  ],
-  "suggestion": null,
-  "time_taken": 0.045
-}
+**Semantic Search Endpoint:**
+```bash
+curl "http://127.0.0.1:5000/api/semantic-search?q=machine+learning&k=5"
+```
+
+**Autocomplete Endpoint:**
+```bash
+curl "http://127.0.0.1:5000/api/autocomplete?prefix=ma"
+```
+
+**Analytics Endpoints:**
+```bash
+# Get analytics stats
+curl "http://127.0.0.1:5000/api/analytics"
+
+# Get top queries
+curl "http://127.0.0.1:5000/api/top-queries"
+
+# Get related queries
+curl "http://127.0.0.1:5000/api/related-queries?q=machine+learning"
+```
+
+**Document Management:**
+```bash
+# Add a document (POST)
+curl -X POST "http://127.0.0.1:5000/api/documents" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "New Doc", "text": "Document content here"}'
+
+# Remove a document (DELETE)
+curl -X DELETE "http://127.0.0.1:5000/api/documents/1"
 ```
 
 **Other Endpoints:**
