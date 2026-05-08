@@ -465,7 +465,7 @@ class EngineConfig:
 2. **M. Ahad Imran** - F23607034
 3. **Syed Zain-ul-Abidin** - F23607031
 4. **M. Usman Nasir** - F23607004
-5. **Muhammad Abdul Ghani ** - F23607005
+5. **Muhammad Abdul Ghani** - F23607005
 ---
 
 ## 🧪 Development
