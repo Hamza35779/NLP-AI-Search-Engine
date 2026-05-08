@@ -14,6 +14,7 @@ from .config import DEFAULT_CONFIG, EngineConfig
 from .document import Document
 from .document_loader import iter_documents
 from .indexer import InvertedIndex
+from .metrics import SearchMetrics
 from .preprocessing import Preprocessor
 from .query_processor import ParsedQuery, QueryProcessor
 from .ranker import Ranker
@@ -71,6 +72,7 @@ class SearchEngine:
         self._analytics: Optional[SearchAnalytics] = None
         self._autocomplete: Optional[Autocomplete] = None
         self._semantic_search: Optional[SemanticSearch] = None
+        self._metrics = SearchMetrics()
 
         if self.config.enable_analytics:
             self._init_analytics()
@@ -250,6 +252,49 @@ class SearchEngine:
         if self._analytics:
             return self._analytics.get_related_queries(query, limit)
         return []
+
+    def search_with_filters(
+        self,
+        raw_query: str,
+        top_k: int = 10,
+        filters: dict = None,
+        sort_by: str = "relevance",
+    ) -> List[SearchResult]:
+        """Search with facet filters and sorting options."""
+        results = self.search(raw_query, top_k=top_k * 2)  # Get more for filtering
+
+        # Apply filters
+        if filters:
+            if filters.get("domain"):
+                results = [r for r in results if r.domain == filters["domain"]]
+            if filters.get("source"):
+                results = [r for r in results if r.source == filters["source"]]
+            if filters.get("min_score"):
+                results = [r for r in results if r.score >= filters["min_score"]]
+
+        # Apply sorting
+        if sort_by == "title":
+            results.sort(key=lambda r: (r.title or "").lower())
+        elif sort_by == "title_desc":
+            results.sort(key=lambda r: (r.title or "").lower(), reverse=True)
+        elif sort_by == "score_asc":
+            results.sort(key=lambda r: r.score)
+
+        return results[:top_k]
+
+    def get_facets(self, results: List[SearchResult]) -> dict:
+        """Generate facet counts from results."""
+        domains: dict = {}
+        sources: dict = {}
+        for r in results:
+            if r.domain:
+                domains[r.domain] = domains.get(r.domain, 0) + 1
+            if r.source:
+                sources[r.source] = sources.get(r.source, 0) + 1
+        return {
+            "domains": sorted(domains.items(), key=lambda x: x[1], reverse=True),
+            "sources": sorted(sources.items(), key=lambda x: x[1], reverse=True),
+        }
 
     def add_document(self, doc: Document) -> None:
         """Add a document to the index."""

@@ -97,6 +97,39 @@
         </div>
       {% endif %}
 
+      {% if facets %}
+        <div class="facets" id="facets">
+          {% if facets.domains %}
+            <div class="facet-group">
+              <h4>Domains</h4>
+              <ul>
+                {% for domain, count in facets.domains[:5] %}
+                  <li>
+                    <a href="{{ url_for('search', q=query, model=model, domain=domain) }}">
+                      {{ domain }} ({{ count }})
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          {% if facets.sources %}
+            <div class="facet-group">
+              <h4>Sources</h4>
+              <ul>
+                {% for source, count in facets.sources[:5] %}
+                  <li>
+                    <a href="{{ url_for('search', q=query, model=model, source=source) }}">
+                      {{ source }} ({{ count }})
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
       <ol class="results">
         {% for r in results %}
           <li class="result">
@@ -107,6 +140,13 @@
                 {{ r.title }}
               {% endif %}
             </h3>
+            <div class="result-actions">
+              <button class="bookmark-btn" data-result='{{ r.to_dict() | tojson }}'>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+              </button>
+            </div>
             <div class="result-meta">
               <span class="badge">score {{ '%.3f' % r.score }}</span>
               <span class="score-bar" aria-hidden="true">

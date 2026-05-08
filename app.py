@@ -49,6 +49,9 @@ def create_app(corpus: Optional[str] = None, model: str = "bm25") -> Flask:
     )
     engine = _build_engine(corpus_dir, model)
 
+    # Initialize metrics
+    metrics = engine._metrics
+
     # ------------------------------------------------------------------ HTML
     @app.route("/")
     def index():
@@ -110,8 +113,12 @@ def create_app(corpus: Optional[str] = None, model: str = "bm25") -> Flask:
         top_k = max(1, min(int(request.args.get("k", 10) or 10), 50))
 
         start_time = time.time()
+        cache_hit = q and search_cache.get(q, model_name, top_k) is not None
         results = engine.search(q, top_k=top_k) if q else []
         elapsed = time.time() - start_time
+
+        # Record metrics
+        metrics.record_search(elapsed, cache_hit)
         
         logger.info(f"API search: '{q}' | Model: {model_name} | Results: {len(results)} | Time: {elapsed:.3f}s")
 
@@ -139,9 +146,80 @@ def create_app(corpus: Optional[str] = None, model: str = "bm25") -> Flask:
 
     @app.route("/healthz")
     def healthz():
-        return jsonify({"status": "ok", "documents": engine.index.num_documents})
+        index_healthy = engine.index is not None and engine.index.num_documents > 0
+        return jsonify({
+            "status": "ok" if index_healthy else "degraded",
+            "documents": engine.index.num_documents if engine.index else 0,
+            "model": engine.ranker.model_name,
+            "uptime_seconds": round(time.time() - engine._metrics._start_time),
+            "index_healthy": index_healthy,
+        }), 200 if index_healthy else 503
+
+    @app.route("/readyz")
+    def readyz():
+        if engine.index and engine.index.num_documents > 0:
+            return jsonify({"status": "ready"}), 200
+        return jsonify({"status": "not ready"}), 503
+
+    @app.route("/metrics")
+    def prometheus_metrics():
+        """Prometheus-compatible metrics endpoint."""
+        return engine._metrics.get_prometheus_metrics(), 200, {"Content-Type": "text/plain"}
+
+    @app.route("/api/metrics")
+    def api_metrics():
+        """JSON metrics for custom dashboards."""
+        return jsonify(engine._metrics.get_json_metrics())
 
     # ------------------------------------------------------------------ New API endpoints
+
+    @app.route("/api/search")
+    def api_search():
+        q = (request.args.get("q") or "").strip()
+        model_requested = request.args.get("model")
+        if model_requested and model_requested not in AVAILABLE_MODELS:
+            logger.warning(f"Unknown model requested: {model_requested}")
+            return jsonify({"error": f"unknown model {model_requested!r}"}), 400
+        model_name = _select_model(engine, model_requested)
+        top_k = max(1, min(int(request.args.get("k", 10) or 10), 50)
+
+        # Filters
+        filters = {}
+        if request.args.get("domain"):
+            filters["domain"] = request.args.get("domain")
+        if request.args.get("source"):
+            filters["source"] = request.args.get("source")
+        if request.args.get("min_score"):
+            filters["min_score"] = float(request.args.get("min_score"))
+
+        # Sorting
+        sort_by = request.args.get("sort", "relevance")
+
+        start_time = time.time()
+        cache_hit = q and search_cache.get(q, model_name, top_k) is not None
+        results = engine.search_with_filters(
+            q, top_k=top_k, filters=filters, sort_by=sort_by
+        ) if q else []
+        elapsed = time.time() - start_time
+
+        # Record metrics
+        metrics.record_search(elapsed, cache_hit)
+
+        facets = engine.get_facets(results) if filters or sort_by != "relevance" else None
+
+        logger.info(f"API search: '{q}' | Model: {model_name} | Results: {len(results)} | Time: {elapsed:.3f}s")
+
+        return jsonify(
+            {
+                "query": q,
+                "model": model_name,
+                "top_k": top_k,
+                "results": [r.to_dict() for r in results],
+                "suggestion": engine.suggest_query(q) if q else None,
+                "time_taken": round(elapsed, 3),
+                "facets": facets,
+            }
+        )
 
     @app.route("/api/semantic-search")
     def api_semantic_search():
@@ -243,6 +321,65 @@ def create_app(corpus: Optional[str] = None, model: str = "bm25") -> Flask:
         except Exception as e:
             logger.error(f"Failed to add document: {e}")
             return jsonify({"error": str(e)}), 500
+
+    @app.route("/api/batch-search", methods=["POST"])
+    def api_batch_search():
+        """Search multiple queries at once."""
+        data = request.get_json()
+        if not data or "queries" not in data:
+            return jsonify({"error": "JSON body with 'queries' array required"}), 400
+
+        queries = data["queries"]
+        if not isinstance(queries, list) or len(queries) > 20:
+            return jsonify({"error": "Maximum 20 queries per batch"}), 400
+
+        top_k = int(data.get("top_k", 10))
+        model = data.get("model", "bm25")
+
+        results = {}
+        for q in queries:
+            q = q.strip()
+            if q:
+                results[q] = [r.to_dict() for r in engine.search(q, top_k=top_k)]
+
+        return jsonify({
+            "results": results,
+            "query_count": len(results),
+        })
+
+    @app.route("/api/export")
+    def api_export():
+        """Export search results in various formats."""
+        q = (request.args.get("q") or "").strip()
+        if not q:
+            return jsonify({"error": "Query parameter 'q' is required"}), 400
+
+        format = request.args.get("format", "json")
+        top_k = int(request.args.get("k", 100))
+
+        results = engine.search(q, top_k=top_k)
+
+        if format == "csv":
+            import csv
+            from io import StringIO
+            output = StringIO()
+            writer = csv.DictWriter(output, fieldnames=["doc_id", "title", "score", "source", "url"])
+            writer.writeheader()
+            for r in results:
+                writer.writerow(r.to_dict())
+            response = app.response_class(
+                response=output.getvalue(),
+                status=200,
+                mimetype='text/csv'
+            )
+            response.headers['Content-Disposition'] = f'attachment; filename=search_results_{q}.csv'
+            return response
+
+        return jsonify({
+            "query": q,
+            "results": [r.to_dict() for r in results],
+            "exported_at": time.time(),
+        })
 
     @app.route("/api/documents/<int:doc_id>", methods=["DELETE"])
     def api_remove_document(doc_id):
