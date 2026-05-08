@@ -41,8 +41,8 @@ def build_contributing(styles) -> list:
 
     f.append(section(styles, "2", "Setting Up"))
     f.append(code_block(styles, [
-        "git clone https://github.com/AbdulGhani002/nlp-search-engine.git",
-        "cd nlp-search-engine",
+        "git clone https://github.com/Hamza35779/NLP-AI-Search-Engine.git",
+        "cd NLP-AI-Search-Engine",
         "python -m venv .venv && source .venv/bin/activate",
         "pip install -e \".[dev]\"",
         "pre-commit install",
@@ -95,18 +95,31 @@ def build_changelog(styles) -> list:
         "Semantic Versioning.",
     )
 
-    f.append(section(styles, "1", "Unreleased"))
-    f.append(small_gap(0.1))
+    f.append(section(styles, "1", "Version 0.3.0 — May 2026"))
+    f.append(body_tight(styles, "<b>Added</b>"))
     f += bullet_list(styles, [
-        "Semantic search using TF-IDF vectors as lightweight embeddings.",
-        "Search analytics tracking with query history and statistics.",
+        "Semantic search using TF-IDF vector embeddings.",
+        "Search analytics tracking with query history and Prometheus metrics.",
         "Query autocomplete API with real-time suggestions.",
-        "Document management API (add/remove documents via API).",
         "Related queries feature to discover similar search terms.",
-        "Enhanced web UI with autocomplete and related queries.",
+        "Faceted search with filters (domain, source, score) and sorting options.",
+        "Search history & bookmarks with LocalStorage and theme toggle.",
+        "Document management API (add/remove documents).",
+        "Batch search API (/api/batch-search) for multiple queries.",
+        "Export results as JSON or CSV (/api/export).",
+        "Enhanced health endpoints (/healthz, /readyz, /metrics).",
+        "Incremental indexing with SQLite persistence backend.",
+        "Updated web UI with autocomplete, bookmarks, and dark/light theme.",
         "New API endpoints: /api/semantic-search, /api/autocomplete, "
         "/api/analytics, /api/top-queries, /api/related-queries.",
-        "Updated version to 0.3.0 with new features.",
+        "Updated version to 0.3.0 with all new features.",
+    ])
+    f.append(body_tight(styles, "<b>Changed</b>"))
+    f += bullet_list(styles, [
+        "Repository URL updated to https://github.com/Hamza35779/NLP-AI-Search-Engine.",
+        "All author references updated to Hamza Abdul Karim · F23607046.",
+        "Enhanced README with comprehensive feature list and new sections.",
+        "Rebuilt all PDF documentation with updated content.",
     ])
 
     f.append(section(styles, "2", "Version 0.2.0 &mdash; May 2026"))

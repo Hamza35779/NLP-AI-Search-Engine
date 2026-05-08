@@ -19,46 +19,47 @@ def build(styles) -> list:
     )
     flow += abstract(
         styles,
-        "The Flask application exposes both HTML pages and a small "
+        "The Flask application exposes both HTML pages and a comprehensive "
         "JSON API. This document enumerates every route, lists their "
         "parameters with default values, and gives the schema of the "
-        "JSON responses.",
+        "JSON responses, including new features in v0.3.0.",
     )
 
+    # 1. Routes
     flow.append(section(styles, "1", "Routes"))
     flow.append(styled_table(
         styles,
         header=("Method", "Path", "Description"),
         rows=[
-            ("GET", "/",
-             "Landing page with search form, examples, feature grid."),
-            ("GET", "/about",
-             "Project overview, API summary, links."),
-            ("GET", "/search",
-             "HTML results page."),
-            ("GET", "/api/search",
-             "Ranked results as JSON."),
-            ("GET", "/api/stats",
-             "Corpus statistics as JSON."),
-            ("GET", "/healthz",
-             "Liveness probe."),
+            ("GET", "/", "Landing page with search form, examples, feature grid."),
+            ("GET", "/about", "Project overview, API summary, links."),
+            ("GET", "/search", "HTML results page with facets and bookmarks."),
+            ("GET", "/api/search", "Ranked results as JSON with filters/sorting."),
+            ("GET", "/api/semantic-search", "Semantic search using TF-IDF vectors."),
+            ("POST", "/api/batch-search", "Search multiple queries at once (max 20)."),
+            ("GET", "/api/autocomplete", "Query autocomplete suggestions."),
+            ("GET", "/api/export", "Export results as JSON or CSV."),
+            ("GET", "/api/analytics", "Search analytics statistics."),
+            ("GET", "/api/top-queries", "Top queries by frequency."),
+            ("GET", "/api/related-queries", "Related queries for a given query."),
+            ("POST", "/api/documents", "Add a new document to the index."),
+            ("DELETE", "/api/documents/<id>", "Remove a document from the index."),
+            ("GET", "/api/stats", "Corpus statistics as JSON."),
+            ("GET", "/metrics", "Prometheus-compatible metrics."),
+            ("GET", "/api/metrics", "JSON metrics (P95, P99, hit rate)."),
+            ("GET", "/healthz", "Liveness probe."),
+            ("GET", "/readyz", "Readiness check (for Kubernetes)."),
         ],
         col_widths=[2.0 * 28.35, 3.6 * 28.35, 10.4 * 28.35],
     ))
 
-    # /api/search
+    # 2. GET /api/search
     flow.append(section(styles, "2", "GET /api/search"))
     flow.append(body(
         styles,
-        "Run a query and return ranked results as JSON. The route "
-        "parses bare terms, required terms (<font face='Courier'>+term</font>), "
-        "excluded terms (<font face='Courier'>-term</font>), quoted "
-        "phrases, and the boolean operators "
-        "<font face='Courier'>AND</font> / "
-        "<font face='Courier'>OR</font> / "
-        "<font face='Courier'>NOT</font>.",
+        "Run a query and return ranked results as JSON. Supports "
+        "facets, sorting, and all query syntax options.",
     ))
-
     flow.append(subsection(styles, "2.1", "Query parameters"))
     flow.append(small_gap(0.1))
     flow.append(styled_table(
@@ -66,17 +67,18 @@ def build(styles) -> list:
         header=("Name", "Type", "Default", "Description"),
         rows=[
             ("q", "string", "required", "Raw query text."),
-            ("model", "string", "bm25", "One of bm25 or tfidf."),
+            ("model", "string", "bm25", "One of bm25, tfidf, semantic."),
             ("k", "int", "10", "Number of results, clamped to 1..50."),
+            ("domain", "string", "null", "Filter by domain."),
+            ("source", "string", "null", "Filter by source."),
+            ("sort", "string", "relevance", "Sort by relevance/title/score_asc."),
         ],
         col_widths=[2.0 * 28.35, 2.0 * 28.35, 2.4 * 28.35, 9.6 * 28.35],
     ))
-
     flow.append(subsection(styles, "2.2", "Example"))
     flow.append(code_block(styles, [
         'curl "http://127.0.0.1:5000/api/search?q=machine+learning&model=bm25&k=3"',
     ]))
-
     flow.append(subsection(styles, "2.3", "Response shape"))
     flow.append(code_block(styles, [
         "{",
@@ -89,10 +91,11 @@ def build(styles) -> list:
         '      "title": "machine learning",',
         '      "snippet": "<mark>Machine</mark> <mark>learning</mark> ...",',
         '      "score": 3.59904,',
-        '      "source": "machine_learning.txt"',
+        '      "source": "machine_learning.txt",',
         "    }",
         "  ],",
-        '  "suggestion": null',
+        '  "suggestion": null,',
+        '  "facets": {...}',
         "}",
     ]))
     flow.append(body(
@@ -103,38 +106,115 @@ def build(styles) -> list:
         "checker; otherwise it is null.",
     ))
 
-    # /api/stats
-    flow.append(section(styles, "3", "GET /api/stats"))
+    # 3. GET /api/semantic-search
+    flow.append(section(styles, "3", "GET /api/semantic-search"))
     flow.append(body(
         styles,
-        "Returns counters describing the loaded index.",
+        "Perform semantic search using TF-IDF vector embeddings. "
+        "Returns results ranked by cosine similarity.",
     ))
     flow.append(code_block(styles, [
+        'curl "http://127.0.0.1:5000/api/semantic-search?q=machine+learning&k=5"',
+    ]))
+    flow.append(code_block(styles, [
         "{",
-        '  "documents": 7,',
-        '  "vocabulary_size": 305,',
-        '  "total_tokens": 482,',
-        '  "avg_doc_length": 68.85,',
-        '  "model": "bm25"',
+        '  "query": "machine learning",',
+        '  "model": "semantic",',
+        '  "top_k": 5,',
+        '  "results": [...],',
+        '  "time_taken": 0.123',
         "}",
     ]))
 
-    # /healthz
-    flow.append(section(styles, "4", "GET /healthz"))
+    # 4. POST /api/batch-search
+    flow.append(section(styles, "4", "POST /api/batch-search"))
     flow.append(body(
         styles,
-        "Lightweight liveness check, suitable for Docker or Kubernetes "
-        "probes.",
+        "Search multiple queries at once (max 20 queries per batch).",
     ))
     flow.append(code_block(styles, [
+        'curl -X POST "http://127.0.0.1:5000/api/batch-search" \\',
+        '  -H "Content-Type: application/json" \\',
+        '  -d \'{"queries": ["ml", "nlp"], "top_k": 5}\'',
+    ]))
+    flow.append(code_block(styles, [
         "{",
-        '  "status": "ok",',
-        '  "documents": 7',
+        '  "results": {',
+        '    "ml": [...],',
+        '    "nlp": [...]',
+        "  },",
+        '  "query_count": 2,',
         "}",
     ]))
 
-    # Error handling
-    flow.append(section(styles, "5", "Error Handling"))
+    # 5. GET /api/export
+    flow.append(section(styles, "5", "GET /api/export"))
+    flow.append(body(
+        styles,
+        "Export search results in JSON or CSV format.",
+    ))
+    flow.append(code_block(styles, [
+        'curl "http://127.0.0.1:5000/api/export?q=ml&format=csv"',
+    ]))
+
+    # 6. GET /api/autocomplete
+    flow.append(section(styles, "6", "GET /api/autocomplete"))
+    flow.append(body(
+        styles,
+        "Get autocomplete suggestions for a prefix as you type.",
+    ))
+    flow.append(code_block(styles, [
+        'curl "http://127.0.0.1:5000/api/autocomplete?prefix=ma"',
+    ]))
+    flow.append(code_block(styles, [
+        "{",
+        '  "prefix": "ma",',
+        '  "suggestions": ["machin", "main", "make"]',
+        "}",
+    ]))
+
+    # 7. Analytics endpoints
+    flow.append(section(styles, "7", "Analytics Endpoints"))
+    flow.append(code_block(styles, [
+        'curl "http://127.0.0.1:5000/api/analytics"',
+        'curl "http://127.0.0.1:5000/api/top-queries"',
+        'curl "http://127.0.0.1:5000/api/related-queries?q=ml"',
+    ]))
+
+    # 8. Document Management
+    flow.append(section(styles, "8", "Document Management"))
+    flow.append(body(
+        styles,
+        "Add or remove documents via API endpoints.",
+    ))
+    flow.append(code_block(styles, [
+        '# Add document (POST)',
+        'curl -X POST "http://127.0.0.1:5000/api/documents" \\',
+        '  -H "Content-Type: application/json" \\',
+        '  -d \'{"title": "Doc", "text": "content"}\'',
+        '',
+        '# Remove document (DELETE)',
+        'curl -X DELETE "http://127.0.0.1:5000/api/documents/1"',
+    ]))
+
+    # 9. Monitoring endpoints
+    flow.append(section(styles, "9", "Monitoring Endpoints"))
+    flow.append(code_block(styles, [
+        '# Prometheus metrics',
+        'curl "http://127.0.0.1:5000/metrics"',
+        '',
+        '# JSON metrics',
+        'curl "http://127.0.0.1:5000/api/metrics"',
+        '',
+        '# Health check',
+        'curl "http://127.0.0.1:5000/healthz"',
+        '',
+        '# Readiness check',
+        'curl "http://127.0.0.1:5000/readyz"',
+    ]))
+
+    # 10. Error handling
+    flow.append(section(styles, "10", "Error Handling"))
     flow.append(styled_table(
         styles,
         header=("Condition", "Response"),
@@ -146,9 +226,9 @@ def build(styles) -> list:
         col_widths=[5.0 * 28.35, 11.0 * 28.35],
     ))
 
-    # Clients
-    flow.append(section(styles, "6", "Calling the API"))
-    flow.append(subsection(styles, "6.1", "Python"))
+    # 11. Clients
+    flow.append(section(styles, "11", "Calling the API"))
+    flow.append(subsection(styles, "11.1", "Python"))
     flow.append(code_block(styles, [
         "import requests",
         "",
@@ -160,8 +240,7 @@ def build(styles) -> list:
         "for hit in resp.json()[\"results\"]:",
         '    print(f"{hit[\\"score\\"]:6.3f}  {hit[\\"title\\"]}")',
     ]))
-
-    flow.append(subsection(styles, "6.2", "JavaScript"))
+    flow.append(subsection(styles, "11.2", "JavaScript"))
     flow.append(code_block(styles, [
         "const res = await fetch(",
         "  '/api/search?' + new URLSearchParams({q: 'neural', model: 'bm25'})",

@@ -34,10 +34,11 @@ def build(styles) -> list:
         "implemented in pure Python. The system follows the classical sparse&#8209;retrieval "
         "pipeline: documents are tokenized, normalized, and indexed into an inverted "
         "index; queries are parsed into structured form and scored against candidate "
-        "documents with either TF&#8209;IDF (cosine similarity) or Okapi BM25; finally, "
-        "matching documents are filtered, snipped, and returned to the caller through a "
-        "single facade. Two front&#8209;ends share this facade: a command&#8209;line "
-        "interface and a Flask web application that also exposes a JSON API. The "
+        "documents with TF&#8209;IDF, Okapi BM25, or semantic search (TF&#8209;IDF vectors); "
+        "finally, matching documents are filtered, snipped, and returned to the caller "
+        "through a single facade. Three front&#8209;ends share this facade: a command&#8209;line "
+        "interface, a Flask web application with theme toggle/bookmarks/history, and a "
+        "comprehensive JSON API with batch operations and Prometheus metrics. The "
         "discussion below introduces every component, its responsibilities, and its "
         "compile&#8209;time dependencies, accompanied by five reference diagrams.",
     )
@@ -100,11 +101,16 @@ def build(styles) -> list:
             ("indexer.py", "InvertedIndex with positional postings."),
             ("tfidf.py", "TF-IDF model with cosine scoring."),
             ("bm25.py", "Okapi BM25 with tunable k1 / b."),
-            ("ranker.py", "Lazy facade over the two ranking models."),
+            ("semantic_search.py", "Semantic search with TF-IDF vectors."),
+            ("ranker.py", "Lazy facade over the ranking models."),
             ("query_processor.py", "Parse +must, -must-not, phrases, booleans."),
             ("snippet.py", "Best-window snippet with <mark> highlighting."),
             ("spell_check.py", "Damerau-Levenshtein vocabulary lookup."),
-            ("metrics.py", "Precision, recall, MAP, MRR, nDCG@k."),
+            ("analytics.py", "Search analytics tracking."),
+            ("autocomplete.py", "Query autocomplete suggestions."),
+            ("cache.py", "Search result caching layer."),
+            ("metrics.py", "IR metrics + SearchMetrics class."),
+            ("persistence.py", "SQLite backend (optional)."),
             ("search_engine.py", "End-to-end SearchEngine facade."),
         ],
         col_widths=[4.4 * 28.35, 11.6 * 28.35],

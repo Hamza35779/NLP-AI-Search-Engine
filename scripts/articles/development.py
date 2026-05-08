@@ -22,6 +22,14 @@ def build(styles) -> list:
         styles,
         "This guide describes how to set up a working environment for "
         "the NLP search engine, the conventions the codebase follows, "
+        "and the steps required to add new features such as semantic search, "
+        "analytics tracking, autocomplete, faceted search, or incremental indexing. "
+        "The supplied Makefile and Docker image cover the common day&#8209;to&#8209;day operations.",
+    )
+    flow += abstract(
+        styles,
+        "This guide describes how to set up a working environment for "
+        "the NLP search engine, the conventions the codebase follows, "
         "and the steps required to add a new ranking model or "
         "front&#8209;end. The supplied Makefile and Docker image cover "
         "the common day&#8209;to&#8209;day operations.",
@@ -39,8 +47,8 @@ def build(styles) -> list:
     # 2. Getting started
     flow.append(section(styles, "2", "Getting Started"))
     flow.append(code_block(styles, [
-        "git clone https://github.com/AbdulGhani002/nlp-search-engine.git",
-        "cd nlp-search-engine",
+        "git clone https://github.com/Hamza35779/NLP-AI-Search-Engine.git",
+        "cd NLP-AI-Search-Engine",
         "",
         "python -m venv .venv",
         "# Linux/macOS:    source .venv/bin/activate",
@@ -70,6 +78,8 @@ def build(styles) -> list:
             ("Lint with Ruff", "make lint"),
             ("Format with Black", "make format"),
             ("Build the Docker image", "make docker"),
+            ("View Prometheus metrics", "curl http://127.0.0.1:5000/metrics"),
+            ("Batch search", "curl -X POST http://127.0.0.1:5000/api/batch-search"),
         ],
         col_widths=[6.0 * 28.35, 10.0 * 28.35],
     ))
@@ -78,20 +88,28 @@ def build(styles) -> list:
     flow.append(section(styles, "4", "Repository Layout"))
     flow.append(code_block(styles, [
         "nlp-search-engine/",
-        " app.py                  Flask UI",
+        " app.py                  Flask UI (with new endpoints)",
         " cli.py                  Argparse CLI",
-        " pyproject.toml          Packaging + tool config",
+        " requirements.txt            Python dependencies",
+        " pyproject.toml          Packaging + tool config (v0.3.0)",
         " Dockerfile              Production container",
         " Makefile                Common commands",
-        " data/sample_docs/       Tiny demo corpus",
-        " docs/                   PDFs and SVG diagrams",
-        " examples/               Standalone usage examples",
-        " scripts/                build_index.py, build_docs.py, helpers",
+        " README.md              This file",
+        " LICENSE                MIT License",
         " src/                    Engine source (every file <200 lines)",
-        " static/                 CSS, logos",
-        " templates/              Jinja2 templates",
-        " tests/                  Pytest suite",
-        " .github/                CI workflows",
+        "  ├── search_engine.py  Main facade (with analytics, metrics)",
+        "  ├── semantic_search.py Semantic search (TF-IDF vectors)",
+        "  ├── analytics.py       Search analytics tracking",
+        "  ├── autocomplete.py    Query autocomplete suggestions",
+        "  ├── persistence.py     SQLite backend (optional)",
+        "  └── config.py          Configuration (v0.3.0)",
+        " templates/              Jinja2 templates (with history, bookmarks)",
+        " static/                 CSS, JS (app.js), and images",
+        "  └── js/                JavaScript (history, bookmarks, theme)",
+        " tests/                  Pytest suite (25 tests)",
+        " scripts/                Build/indexing scripts",
+        " examples/               Usage examples",
+        " data/                   Sample corpus",
     ]))
 
     # 5. Coding conventions

@@ -33,11 +33,11 @@ def build(styles) -> list:
         "and TF&#8209;IDF / Okapi BM25 ranking &mdash; in roughly two thousand "
         "lines of Python. The code is organised into single&#8209;responsibility "
         "files of fewer than two hundred lines each, so it can be read in "
-        "one sitting. Two front&#8209;ends share the same SearchEngine "
-        "facade: a command&#8209;line interface and a Flask web "
-        "application that also exposes a JSON API. The system was built "
-        "as an NLP coursework project and is also a usable search engine "
-        "for small corpora.",
+        "one sitting. Features include semantic search with TF&#8209;IDF vectors, "
+        "search analytics, query autocomplete, faceted search with filters, "
+        "batch operations, and incremental indexing. Three front&#8209;ends share "
+        "the same SearchEngine facade: a command&#8209;line interface, a Flask web "
+        "application with dark/light theme toggle, and a comprehensive JSON API.",
     )
 
     # 1. What's inside
@@ -47,15 +47,21 @@ def build(styles) -> list:
         "stop&#8209;word removal, and a compact Porter stemmer.",
         "<b>Inverted index</b> &mdash; postings carry term frequencies "
         "and positions, enabling phrase queries.",
-        "<b>TF&minus;IDF and BM25</b> &mdash; two interchangeable rankers; "
-        "BM25 has tunable <i>k1</i> and <i>b</i> parameters.",
+        "<b>Multiple ranking models</b> &mdash; TF&minus;IDF, BM25, "
+        "and semantic search with TF&minus;IDF vectors.",
+        "<b>Smart query parsing</b> &mdash; phrases, +must, &minus;exclude, "
+        "boolean operators (AND, OR, NOT).",
         "<b>Snippets and highlights</b> &mdash; best&#8209;window selection "
         "with matched&#8209;term highlighting.",
         "<b>Spell suggestions</b> &mdash; Damerau&ndash;Levenshtein "
         "matching against the index vocabulary.",
-        "<b>Two front&#8209;ends</b> &mdash; argparse CLI and a Flask "
-        "web application with a JSON API at "
-        "<font face='Courier'>/api/search</font>.",
+        "<b>Search analytics</b> &mdash; query tracking, top queries, "
+        "related queries, and Prometheus metrics.",
+        "<b>Faceted search</b> &mdash; filter by domain, source, score; "
+        "sort by relevance, title, or score.",
+        "<b>Autocomplete</b> &mdash; real&dash;time suggestions as you type.",
+        "<b>Three front&#8209;ends</b> &mdash; CLI, Flask web UI with "
+        "theme toggle, bookmarks, history, and comprehensive JSON API.",
     ])
 
     # 2. Architecture
@@ -80,8 +86,8 @@ def build(styles) -> list:
     # 3. Quickstart
     flow.append(section(styles, "3", "Quickstart"))
     flow.append(code_block(styles, [
-        "git clone https://github.com/AbdulGhani002/nlp-search-engine.git",
-        "cd nlp-search-engine",
+        "git clone https://github.com/Hamza35779/NLP-AI-Search-Engine.git",
+        "cd NLP-AI-Search-Engine",
         "",
         "pip install -r requirements.txt",
         "python scripts/build_index.py",
@@ -109,19 +115,59 @@ def build(styles) -> list:
     flow.append(section(styles, "5", "Project Layout"))
     flow.append(code_block(styles, [
         "nlp-search-engine/",
-        " app.py             Flask web UI",
+        " app.py             Flask web UI (with new endpoints)",
         " cli.py             Argparse CLI",
-        " pyproject.toml     Packaging + tool configuration",
+        " requirements.txt            Python dependencies",
+        " pyproject.toml     Packaging + tool config",
         " Dockerfile         Production container",
-        " Makefile           Common commands",
-        " data/sample_docs/  Tiny NLP-themed corpus",
-        " docs/              PDFs and SVG diagrams",
-        " examples/          Standalone usage examples",
-        " scripts/           build_index.py, build_docs.py",
+        " Makefile           Build automation",
+        " README.md                  This file",
+        " LICENSE                    MIT License",
+        "│",
         " src/               Engine source (every file <200 lines)",
-        " static/            CSS bundle and SVG brand assets",
-        " templates/         Jinja2 templates for the web UI",
-        " tests/             Pytest suite",
+        "│   ├── search_engine.py       Main facade (with caching, analytics, metrics)",
+        "│   ├── document.py           Document class (with URL/domain support)",
+        "│   ├── document_loader.py     Corpus loading + web crawling",
+        "│   ├── indexer.py            Inverted index",
+        "│   ├── ranker.py             Ranking model wrapper",
+        "│   ├── bm25.py               BM25 implementation",
+        "│   ├── tfidf.py              TF-IDF implementation",
+        "│   ├── semantic_search.py    Semantic search (TF-IDF vectors)",
+        "│   ├── preprocessing.py      Tokenization, stemming, stopwords",
+        "│   ├── query_processor.py   Query parsing",
+        "│   ├── snippet.py            Snippet generation",
+        "│   ├── spell_check.py        Spell checker",
+        "│   ├── cache.py              Search result caching layer",
+        "│   ├── logger.py             Logging configuration",
+        "│   ├── metrics.py            IR metrics + SearchMetrics",
+        "│   ├── analytics.py          Search analytics tracking",
+        "│   ├── autocomplete.py       Query autocomplete suggestions",
+        "│   ├── persistence.py        SQLite backend (optional)",
+        "│   ├── config.py             Configuration (v0.3.0)",
+        "│   └── utils.py              Helper functions",
+        "│",
+        " templates/                 Jinja2 HTML templates",
+        "│   ├── base.html             Base layout (history, bookmarks, theme)",
+        "│   ├── index.html            Home page with hero section",
+        "│   ├── results.html          Search results (facets, bookmarks)",
+        "│   ├── about.html            Project information",
+        "│   └── _partials/           Reusable components",
+        "│",
+        " static/                    CSS, JS, and images",
+        "│   ├── css/",
+        "│   │   ├── base.css          Design tokens, typography, layout (v2)",
+        "│   │   ├── components.css    Search form, cards, badges (v2)",
+        "│   │   ├── home.css          Hero, features, steps",
+        "│   │   └── results.css      Results page layout (v2)",
+        "│   ├── js/",
+        "│   │   └── app.js            Search history, bookmarks, theme toggle",
+        "│   └── img/                 Logos and favicons",
+        "│",
+        " tests/                     pytest test suite (25 tests)",
+        " scripts/                   Build/indexing scripts",
+        " examples/                  Usage examples",
+        "└── data/                      Sample corpus",
+        "    └── sample_docs/          7 NLP/IR documents",
     ]))
 
     # 6. Documentation
@@ -133,7 +179,9 @@ def build(styles) -> list:
         rows=[
             ("System overview and diagrams", "docs/architecture.pdf"),
             ("TF-IDF and BM25 in depth", "docs/ranking-models.pdf"),
-            ("HTTP/JSON API", "docs/api.pdf"),
+            ("Semantic search with TF-IDF vectors", "docs/semantic-search.pdf"),
+            ("HTTP/JSON API (full reference)", "docs/api.pdf"),
+            ("Search analytics and metrics", "docs/analytics.pdf"),
             ("Dev environment and contributing",
              "docs/development.pdf and CONTRIBUTING.pdf"),
             ("Release history", "CHANGELOG.pdf"),
@@ -152,8 +200,21 @@ def build(styles) -> list:
         "helpers.",
     ))
 
-    # 8. License
-    flow.append(section(styles, "8", "License"))
+    # 8. New Features in v0.3.0
+    flow.append(section(styles, "8", "New Features in v0.3.0"))
+    flow += bullet_list(styles, [
+        "<b>Semantic Search</b> &mdash; TF-IDF vector embeddings for semantic matching.",
+        "<b>Search Analytics</b> &mdash; query tracking, top queries, related queries.",
+        "<b>Query Autocomplete</b> &mdash; real-time suggestions as you type.",
+        "<b>Faceted Search</b> &mdash; filter by domain, source, score; sort options.",
+        "<b>Search History & Bookmarks</b> &mdash; LocalStorage with theme toggle.",
+        "<b>Batch Search API</b> &mdash; process up to 20 queries at once.",
+        "<b>Metrics & Monitoring</b> &mdash; Prometheus endpoint, health checks.",
+        "<b>Incremental Indexing</b> &mdash; SQLite backend for efficient updates.",
+    ])
+
+    # 9. License
+    flow.append(section(styles, "9", "License"))
     flow.append(body(
         styles,
         "MIT &copy; 2026 Hamza Abdul Karim. See the bundled "
